@@ -5,12 +5,14 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { FiltersDto } from './dto/filters-dto';
 import { TaskStatusValidationPipe } from './pipes/task-status-validation-pipe';
-import { Task } from './task.entity';
+
 import { taskStatus } from './task-status.enum';
+import { Task } from './task.schema';
 
 @Controller('tasks')
 export class TasksController {
-    constructor(private tasksService:TasksService){}
+    constructor(
+        private tasksService:TasksService){}
 
 // @Get()
 //     getTasks(@Query(ValidationPipe) filterDto:FiltersDto):Task[]{
@@ -21,7 +23,10 @@ export class TasksController {
 //         }
 
 //     }
-
+@Get()
+async getTasks():Promise<Task[]>{
+    return this.tasksService.getTasks()
+}
 
 @Get(':id')
     getTaskById(@Param('id') id:string):Promise<Task>{
@@ -30,7 +35,7 @@ export class TasksController {
     }
 
 @Post()
-@UsePipes(ValidationPipe)
+// @UsePipes(ValidationPipe)
 createTask(@Body() createTaskDto:CreateTaskDto):Promise<Task>{
     return this.tasksService.createTask(createTaskDto);
 
