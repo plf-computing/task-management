@@ -1,17 +1,11 @@
-import { Injectable, NotFoundException, Search } from '@nestjs/common';
-
-
+import { Injectable, NotFoundException} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { FiltersDto } from './dto/filters-dto';
-
-
-
-
-
 import { taskStatus } from './task-status.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { Task } from './task.schema';
+
 
 
 
@@ -25,34 +19,30 @@ export class TasksService {
     ){}
     
 
-
-    // private tasks:Task[] = [];
-
-    // getAllTasks():Task[]{
-    //     return this.tasks; 
-    // }
-
-    // getTasksWithFilters(filterDto:FiltersDto):Task[]{
+    async getTasksWithFilters(filterDto: FiltersDto): Promise<Task[]> {
+        const { status, search } = filterDto;
       
-    //     const { status, search } = filterDto;
+        const filter: any = {};
+      
+        if (status) {
+          filter.status = status;
+        }
+      
+        if (search) {
+          filter.$or = [
+            { title: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
+          ];
+        }
+      
+        const tasks = await this.taskModel.find(filter);
+      
+        return tasks;
+      }
+    
 
-    //     let tasks = this.getAllTasks();
-    //     if(status){
-    //         tasks = tasks.filter(task=> task.status === status)
-    //     }
-    //     if(search){
-    //         tasks = tasks.filter(task =>
-    //             task.title.includes(search)||
-    //             task.description.includes(search)
+    
 
-    //         )
-
-    //     }
-    //     return tasks;
-
-    // }
-   
-    // 
    
     
     async createTask(createTaskDto:CreateTaskDto):Promise<Task>{
@@ -96,10 +86,13 @@ export class TasksService {
 
         async deleteTaskById(id:string):Promise<void>{
             const deleted = await this.taskModel.findByIdAndDelete(id);
+            
 
             if(!deleted){
                 throw new NotFoundException(`task with ID "${id}"not found`)
                 }
+                
+                
                 
 
         }

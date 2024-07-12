@@ -27,6 +27,11 @@ export class TasksController {
 async getTasks():Promise<Task[]>{
     return this.tasksService.getTasks()
 }
+@Get('filters')
+async getTasksWithFilters(@Query(ValidationPipe) filterDto:FiltersDto):Promise<Task[]>{
+    return this.tasksService.getTasksWithFilters(filterDto)
+}
+
 
 @Get(':id')
     getTaskById(@Param('id') id:string):Promise<Task>{
