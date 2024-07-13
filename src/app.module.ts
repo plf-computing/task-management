@@ -4,6 +4,7 @@ import { TasksModule } from './tasks/tasks.module';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 
 
@@ -14,7 +15,8 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true
     }),  
     MongooseModule.forRoot(process.env.DB_URI),
-    TasksModule
+    TasksModule,
+    AuthModule
 
 
 

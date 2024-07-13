@@ -18,6 +18,11 @@ export class TasksService {
 
     ){}
     
+    async getTasks():Promise<Task[]>{
+        const tasks = await this.taskModel.find();
+        return tasks;
+
+    }
 
     async getTasksWithFilters(filterDto: FiltersDto): Promise<Task[]> {
         const { status, search } = filterDto;
@@ -62,11 +67,7 @@ export class TasksService {
     
     
         }
-        async getTasks():Promise<Task[]>{
-            const tasks = await this.taskModel.find();
-            return tasks;
-
-        }
+        
 
 
 
