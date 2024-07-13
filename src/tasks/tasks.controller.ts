@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 
 
@@ -8,14 +8,17 @@ import { TaskStatusValidationPipe } from './pipes/task-status-validation-pipe';
 
 import { taskStatus } from './task-status.enum';
 import { Task } from './task.schema';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
     constructor(
         private tasksService:TasksService){}
 
 
 @Get()
+
 async getTasks():Promise<Task[]>{
     return this.tasksService.getTasks()
 }
