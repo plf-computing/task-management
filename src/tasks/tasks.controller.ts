@@ -9,6 +9,8 @@ import { TaskStatusValidationPipe } from './pipes/task-status-validation-pipe';
 import { taskStatus } from './task-status.enum';
 import { Task } from './task.schema';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/auth/auth.schema';
+import { GetUser } from 'src/auth/get-user.decorator';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
@@ -19,8 +21,8 @@ export class TasksController {
 
 @Get()
 
-async getTasks():Promise<Task[]>{
-    return this.tasksService.getTasks()
+async getTasks(@GetUser() user:User):Promise<Task[]>{
+    return this.tasksService.getTasks(user)
 }
 @Get('filters')
 async getTasksWithFilters(@Query(ValidationPipe) filterDto:FiltersDto):Promise<Task[]>{
@@ -29,26 +31,30 @@ async getTasksWithFilters(@Query(ValidationPipe) filterDto:FiltersDto):Promise<T
 
 
 @Get(':id')
-    getTaskById(@Param('id') id:string):Promise<Task>{
-        return this.tasksService.getTaskById(id);
+    getTaskById(
+        @GetUser() user:User,@Param('id') id:string):Promise<Task| Task[]>{
+        return this.tasksService.getTaskById(id,user);
 
     }
 
 @Post()
 // @UsePipes(ValidationPipe)
-createTask(@Body() createTaskDto:CreateTaskDto):Promise<Task>{
-    return this.tasksService.createTask(createTaskDto);
+createTask(
+    @Body() createTaskDto:CreateTaskDto,
+    @GetUser() user:User,
+):Promise<Task>{
+    return this.tasksService.createTask(createTaskDto, user);
 
 }
 
 @Delete(':id')
-    deleteTaskById(@Param('id') id:string):Promise<void>{
-        return this.tasksService.deleteTaskById(id)
+    deleteTaskById(@GetUser() user:User,@Param('id') id:string):Promise<void>{
+        return this.tasksService.deleteTaskById(id,user)
     }
 
 @Patch(':id/status')
-updateTaskStatus(@Param('id') id:string, @Body('status',TaskStatusValidationPipe) status:taskStatus):Promise<Task>{
-    return this.tasksService.updateTaskStatus(id,status)
+updateTaskStatus(@GetUser() user:User,@Param('id') id:string, @Body('status',TaskStatusValidationPipe) status:taskStatus):Promise<Task|Task[]>{
+    return this.tasksService.updateTaskStatus(id,status,user)
 
 }
 

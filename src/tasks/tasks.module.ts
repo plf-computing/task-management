@@ -12,7 +12,8 @@ import { AuthModule } from 'src/auth/auth.module';
 
 
 @Module({
-  imports:[AuthModule,MongooseModule.forFeature([{name:'Task',schema: TaskSchema}])
+  imports:[AuthModule,
+    MongooseModule.forFeature([{name:'Task',schema: TaskSchema}])
 ],
   
   controllers: [TasksController],

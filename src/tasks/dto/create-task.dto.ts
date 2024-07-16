@@ -1,4 +1,5 @@
-import { IsNotEmpty } from "class-validator";
+import { IsEmpty, IsNotEmpty } from "class-validator";
+import { User } from "src/auth/auth.schema";
 
 export class CreateTaskDto{
     @IsNotEmpty()
@@ -6,5 +7,8 @@ export class CreateTaskDto{
     
     @IsNotEmpty()
     description: string;
+
+    @IsEmpty()
+    readonly user:User
 
 }

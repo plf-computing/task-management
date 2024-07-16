@@ -21,10 +21,11 @@ export class Task {
     description:string;
 
     @Prop()
-    status:taskStatus
+    status:taskStatus;
 
-    // @Prop({type:mongoose.Schema.Types.ObjectId,ref:'User'})
-    // user:User
+   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+   user:User;
 
+   
 }
 export const TaskSchema = SchemaFactory.createForClass(Task)

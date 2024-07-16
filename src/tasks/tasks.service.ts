@@ -5,6 +5,7 @@ import { taskStatus } from './task-status.enum';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { Task } from './task.schema';
+import { User } from 'src/auth/auth.schema';
 
 
 
@@ -18,8 +19,13 @@ export class TasksService {
 
     ){}
     
-    async getTasks():Promise<Task[]>{
-        const tasks = await this.taskModel.find();
+    async getTasks(user:User):Promise<Task[]>{
+        const filter: any = {};
+      
+        if (user) {
+          filter.user= user;
+        }
+        const tasks = await this.taskModel.find(filter);
         return tasks;
 
     }
@@ -50,15 +56,22 @@ export class TasksService {
 
    
     
-    async createTask(createTaskDto:CreateTaskDto):Promise<Task>{
-
+    async createTask(
+        createTaskDto:CreateTaskDto,
+        user:User
+    ):Promise<Task>{
+        
+        
             const {title,description} = createTaskDto;
             
             const task = new Task();
             task.title = title;
             task.description = description;
             task.status = taskStatus.OPEN;
+            task.user = user;
+            
             await this.taskModel.create(task);
+            delete task.user
             
             
             return task;
@@ -69,24 +82,24 @@ export class TasksService {
         }
         
 
-
-
-
-
-
-
-        async getTaskById(id:string):Promise<Task>{
-            const found = await this.taskModel.findById(id);
-            if(!found){
-                throw new NotFoundException(`task with ID "${id}"not found`)
-            
-                    }
-            return found;
-            
+        async getTaskById(id: string, user:User): Promise<Task> {
+          if (user) {
+            const found = await this.taskModel.findOne({ _id: id,user })
+            if (!found) {
+              throw new NotFoundException(`task with ID "${id}" and user ID "${user}" not found`)
+            }
+            return found
+          }
         }
+      
 
-        async deleteTaskById(id:string):Promise<void>{
-            const deleted = await this.taskModel.findByIdAndDelete(id);
+
+
+
+       
+
+        async deleteTaskById(id:string,user:User):Promise<void>{
+            const deleted = await this.taskModel.findByIdAndDelete({_id:id,user});
             
 
             if(!deleted){
@@ -99,8 +112,8 @@ export class TasksService {
         }
        
        
-        async updateTaskStatus(id:string, status:taskStatus):Promise<Task>{
-            const task =  await this.getTaskById(id);
+        async updateTaskStatus(id:string, status:taskStatus,user:User):Promise<Task>{
+            const task =  await this.getTaskById(id,user);
             task.status = status;
             
             await this.taskModel.findByIdAndUpdate(id,task,{
